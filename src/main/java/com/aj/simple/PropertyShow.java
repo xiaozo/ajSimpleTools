@@ -11,5 +11,5 @@ public @interface PropertyShow {
 
     String obj();
     String meth();
-
+    String suffix() default "_name";
 }

@@ -56,8 +56,9 @@ public class PropertyShowProcessor extends AbstractProcessor {
 
                     if (var1.getKind().equals(Tree.Kind.VARIABLE)) {
                         //添加方法属性
+                        String suffix = element.getAnnotation(PropertyShow.class).suffix();
                         String fieldName = var1.getName().toString();
-                        fieldName = fieldName + "_name";
+                        fieldName = fieldName + suffix;
                         jcClassDecl.defs = jcClassDecl.defs.prepend(treeMaker.VarDef(treeMaker.Modifiers(Flags.PUBLIC),names.fromString(fieldName),memberAccess("java.lang.String"),null));
 
                         //增加方法
