@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.aj.simple</groupId>
-    <artifactId>tools</artifactId>
+    <artifactId>aj-tools</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>tools</name>
+    <name>aj-tools</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
