@@ -1,4 +1,4 @@
-package com.mythsman.test;
+package com.aj.simple;
 
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.api.JavacTrees;
@@ -15,14 +15,10 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
-@SupportedAnnotationTypes({"com.mythsman.test.BindView","com.mythsman.test.BindViews"})
+@SupportedAnnotationTypes({"com.aj.simple.PropertyShow"})
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-public class BindViewProcessor extends AbstractProcessor {
+public class PropertyShowProcessor extends AbstractProcessor {
 
     private Messager messager;
     private JavacTrees trees;
@@ -47,7 +43,7 @@ public class BindViewProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Set<? extends Element> set = roundEnv.getElementsAnnotatedWith(BindView.class);
+        Set<? extends Element> set = roundEnv.getElementsAnnotatedWith(PropertyShow.class);
 
         set.forEach(element -> {
             JCTree jcTree = trees.getTree(element);
@@ -61,12 +57,12 @@ public class BindViewProcessor extends AbstractProcessor {
                     if (var1.getKind().equals(Tree.Kind.VARIABLE)) {
                         //添加方法属性
                         String fieldName = var1.getName().toString();
-                        fieldName = fieldName + "_str";
+                        fieldName = fieldName + "_name";
                         jcClassDecl.defs = jcClassDecl.defs.prepend(treeMaker.VarDef(treeMaker.Modifiers(Flags.PUBLIC),names.fromString(fieldName),memberAccess("java.lang.String"),null));
 
                         //增加方法
-                        String obj = element.getAnnotation(BindView.class).obj();
-                        String meth = element.getAnnotation(BindView.class).meth();
+                        String obj = element.getAnnotation(PropertyShow.class).obj();
+                        String meth = element.getAnnotation(PropertyShow.class).meth();
 
                         ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
                         JCTree.JCExpression param = treeMaker.Select(treeMaker.Ident(names.fromString("this")), var1.getName());
