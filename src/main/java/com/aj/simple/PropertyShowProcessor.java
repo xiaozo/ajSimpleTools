@@ -3,6 +3,7 @@ package com.aj.simple;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.code.Flags;
+import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
@@ -41,6 +42,17 @@ public class PropertyShowProcessor extends AbstractProcessor {
 
     }
 
+    public  JCTree.JCExpression chainDots(String... elems) {
+        assert elems != null;
+
+        JCTree.JCExpression e = null;
+        for (int i = 0 ; i < elems.length ; i++) {
+            e = e == null ? treeMaker.Ident(names.fromString(elems[i])) : treeMaker.Select(e, names.fromString(elems[i]));
+        }
+        assert e != null;
+
+        return e;
+    }
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Set<? extends Element> set = roundEnv.getElementsAnnotatedWith(PropertyShow.class);
@@ -55,24 +67,41 @@ public class PropertyShowProcessor extends AbstractProcessor {
                 public void visitVarDef(JCVariableDecl var1) {
 
                     if (var1.getKind().equals(Tree.Kind.VARIABLE)) {
-                        //添加方法属性
-                        String suffix = element.getAnnotation(PropertyShow.class).suffix();
-                        String fieldName = var1.getName().toString();
-                        fieldName = fieldName + suffix;
-                        jcClassDecl.defs = jcClassDecl.defs.prepend(treeMaker.VarDef(treeMaker.Modifiers(Flags.PUBLIC),names.fromString(fieldName),memberAccess("java.lang.String"),null));
+                        boolean enable = element.getAnnotation(PropertyShow.class).enable();
+//                        if (enable == true) {
+                            //添加方法属性
+                            String suffix = element.getAnnotation(PropertyShow.class).suffix();
+                            String fieldName = var1.getName().toString();
+                            fieldName = fieldName + suffix;
+                            JCVariableDecl val = treeMaker.VarDef(treeMaker.Modifiers(Flags.PUBLIC),names.fromString(fieldName),memberAccess("java.lang.String"),null);
+                            if (enable == false) {
+                                JCTree.JCExpression expression = memberAccess("com.aj.simple.PropertyShowIgnore");
+                                JCTree.JCAnnotation jcAnnotation = treeMaker.Annotation(expression, List.nil());
+                                val.mods.annotations = val.mods.getAnnotations().prepend(jcAnnotation);
+                            }
 
-                        //增加方法
-                        String obj = element.getAnnotation(PropertyShow.class).obj();
-                        String meth = element.getAnnotation(PropertyShow.class).meth();
+                            jcClassDecl.defs = jcClassDecl.defs.prepend(val);
 
-                        ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
-                        JCTree.JCExpression param = treeMaker.Select(treeMaker.Ident(names.fromString("this")), var1.getName());
-                        statements.append(treeMaker.Return( treeMaker.Apply(List.of(var1.vartype),memberAccess(obj+"."+meth),List.of(param))));
-                        JCTree.JCBlock body = treeMaker.Block(0, statements.toList());
-                        //get
-                        JCTree.JCMethodDecl newGetMethodDecl = treeMaker.MethodDef(treeMaker.Modifiers(Flags.PUBLIC), getNewMethodName(fieldName), memberAccess("java.lang.String"), List.nil(), List.nil(), List.nil(), body, null);
-                        jcClassDecl.defs = jcClassDecl.defs.prepend(newGetMethodDecl);
-                    }
+
+                            //增加方法
+                            String obj = element.getAnnotation(PropertyShow.class).obj();
+                            String meth = element.getAnnotation(PropertyShow.class).meth();
+
+                            ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
+                            if (enable) {
+                                JCTree.JCExpression param = treeMaker.Select(treeMaker.Ident(names.fromString("this")), var1.getName());
+                                statements.append(treeMaker.Return( treeMaker.Apply(List.of(var1.vartype),memberAccess(obj+"."+meth),List.of(param))));
+                            } else  {
+                                statements.append(treeMaker.Return(treeMaker.Literal(TypeTag.BOT, null)));
+                            }
+
+                            JCTree.JCBlock body = treeMaker.Block(0, statements.toList());
+                            //get
+                            JCTree.JCMethodDecl newGetMethodDecl = treeMaker.MethodDef(treeMaker.Modifiers(Flags.PUBLIC), getNewMethodName(fieldName), memberAccess("java.lang.String"), List.nil(), List.nil(), List.nil(), body, null);
+                            jcClassDecl.defs = jcClassDecl.defs.prepend(newGetMethodDecl);
+                        }
+
+//                    }
                     super.visitVarDef(var1);
 
 

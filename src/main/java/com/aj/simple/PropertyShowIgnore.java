@@ -6,11 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface PropertyShow {
+@Target({ElementType.FIELD,ElementType.METHOD})
+public @interface PropertyShowIgnore {
 
-    String obj() default "";
-    String meth() default "";
-    String suffix() default "Name";
-    boolean enable() default true;
 }
