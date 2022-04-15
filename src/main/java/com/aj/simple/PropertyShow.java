@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface PropertyShow {
 
-    String obj();
-    String meth();
+    String obj() default "";; 
+    String meth() default "";
     String suffix() default "Name";
 }
