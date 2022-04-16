@@ -78,9 +78,24 @@ public class PropertyShowProcessor extends AbstractProcessor {
                                 JCTree.JCExpression expression = memberAccess("com.aj.simple.PropertyShowIgnore");
                                 JCTree.JCAnnotation jcAnnotation = treeMaker.Annotation(expression, List.nil());
                                 val.mods.annotations = val.mods.getAnnotations().prepend(jcAnnotation);
+
+//                                try {
+//                                    if (Class.forName("com.fasterxml.jackson.annotation.JsonIgnore") != null) {
+//                                        expression = memberAccess("com.fasterxml.jackson.annotation.JsonIgnore");
+//                                        jcAnnotation = treeMaker.Annotation(expression, List.nil());
+//                                        val.mods.annotations = val.mods.getAnnotations().prepend(jcAnnotation);
+//                                    }
+//
+//                                } catch (ClassNotFoundException e) {
+//
+//                                    e.printStackTrace();
+//                                }
+
+
                             }
 
-                            jcClassDecl.defs = jcClassDecl.defs.prepend(val);
+
+                        jcClassDecl.defs = jcClassDecl.defs.prepend(val);
 
 
                             //增加方法
@@ -89,7 +104,8 @@ public class PropertyShowProcessor extends AbstractProcessor {
 
                             ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
                             if (enable) {
-                                JCTree.JCExpression param = treeMaker.Select(treeMaker.Ident(names.fromString("this")), var1.getName());
+//                                JCTree.JCExpression param = treeMaker.Select(treeMaker.Ident(names.fromString("this")), var1.getName());
+                                JCTree.JCExpression param = treeMaker.Apply(List.of(var1.vartype),memberAccess("this."+getNewMethodName( var1.getName().toString())),List.nil());
                                 statements.append(treeMaker.Return( treeMaker.Apply(List.of(var1.vartype),memberAccess(obj+"."+meth),List.of(param))));
                             } else  {
                                 statements.append(treeMaker.Return(treeMaker.Literal(TypeTag.BOT, null)));
