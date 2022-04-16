@@ -104,7 +104,9 @@ public class PropertyShowProcessor extends AbstractProcessor {
 
                             ListBuffer<JCTree.JCStatement> statements = new ListBuffer<>();
                             if (enable) {
+                                ///通过变量访问
 //                                JCTree.JCExpression param = treeMaker.Select(treeMaker.Ident(names.fromString("this")), var1.getName());
+                                ///通过get方法访问
                                 JCTree.JCExpression param = treeMaker.Apply(List.of(var1.vartype),memberAccess("this."+getNewMethodName( var1.getName().toString())),List.nil());
                                 statements.append(treeMaker.Return( treeMaker.Apply(List.of(var1.vartype),memberAccess(obj+"."+meth),List.of(param))));
                             } else  {
