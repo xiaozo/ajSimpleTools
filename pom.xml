@@ -60,7 +60,8 @@
                 <executions>
                     <execution>
                         <id>process-META</id>
-                        <phase>prepare-package</phase>
+                        <phase>deploy</phase>
+
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
